@@ -40,40 +40,34 @@ class _OpenDemoApiPageState extends State<OpenDemoApiPage> {
   var _humidity;
   var _temperature;
 
-  static final Map<int, String> map = {
-    0: "zero",
-    1: "one",
-    2: "two",
-    3: "three",
-    4: "four",
-    5: "five",
-    6: "six",
-    7: "seven",
-    8: "eight",
-    9: "nine",
-    10: "ten",
-    11: "eleven",
-    12: "twelve",
-    13: "thirteen",
-    14: "fourteen",
-    15: "fifteen",
-  };
+//  static final Map<int, String> map = {
+//    0: "zero",
+//    1: "one",
+//    2: "two",
+//    3: "three",
+//    4: "four",
+//    5: "five",
+//    6: "six",
+//    7: "seven",
+//    8: "eight",
+//    9: "nine",
+//    10: "ten",
+//    11: "eleven",
+//    12: "twelve",
+//    13: "thirteen",
+//    14: "fourteen",
+//    15: "fifteen",
+//  };
   String selectedValue;
   List<DropdownMenuItem> items = new List();
+  Map _allCities = new LinkedHashMap<String, int>();
 
   @override
 
   void initState() {
-    map.keys.forEach((key){
-      items.add(DropdownMenuItem(
-        child: Text(map[key]),
-        value: map[key],
-      )
-      );
-    }
-    );
-    super.initState();
 
+    super.initState();
+    setCitiesDropdownListValues();
   }
 
   @override
@@ -94,9 +88,9 @@ class _OpenDemoApiPageState extends State<OpenDemoApiPage> {
             value: selectedValue,
             hint: "Выберите город",
             searchHint: "Выберите город",
-            onChanged: (value) {
+            onChanged: (key) {
               setState(() {
-                selectedValue = value;
+                selectedValue = _allCities[key].toString();
               });
             },
             isExpanded: true,
@@ -120,7 +114,7 @@ class _OpenDemoApiPageState extends State<OpenDemoApiPage> {
 
   _getCurrentWeather() async{
     //units=metric - Celsius
-    var response = await http.get('http://api.openweathermap.org/data/2.5/weather?id=524901&APPID=$_APIKEY&units=metric');
+    var response = await http.get('http://api.openweathermap.org/data/2.5/weather?id=$selectedValue&APPID=$_APIKEY&units=metric');
     if(response.statusCode==200) {
       print( response.body );
       var parsedJson = jsonDecode(response.body);
@@ -133,45 +127,35 @@ class _OpenDemoApiPageState extends State<OpenDemoApiPage> {
     }
   }
 
+  setCitiesDropdownListValues() async{
+    List citiesInRussian = await extractCitiesFromJson();
+    citiesInRussian.forEach((city){
+      if(city['id'] != null && city['name'] != null)
+        _allCities[city['name']] = city['id'];
+        //_allCities.putIfAbsent( city['name'], ()=>city['id'] );
+
+    });
+
+    while(!mounted){
+      print('Warning: cannot set cities dropdown list cuz widget is building');
+    }
+    setState(() {
+      _allCities.forEach((k,v){
+        items.add(DropdownMenuItem(
+          child: Text(k),
+          value: k,
+        )
+        );
+      });
+    });
+
+  }
+
+  Future<List> extractCitiesFromJson( ) async {
+    List data = json.decode(
+        await rootBundle.loadString( 'assets/cities_ru.json' ) );
+
+    return data;
+  }
+
 }
-
-
-class ExampleNumber {
-  int number;
-
-  static final Map<int, String> map = {
-    0: "zero",
-    1: "one",
-    2: "two",
-    3: "three",
-    4: "four",
-    5: "five",
-    6: "six",
-    7: "seven",
-    8: "eight",
-    9: "nine",
-    10: "ten",
-    11: "eleven",
-    12: "twelve",
-    13: "thirteen",
-    14: "fourteen",
-    15: "fifteen",
-  };
-
-  String get numberString {
-    return (map.containsKey(number) ? map[number] : "unknown");
-  }
-
-  ExampleNumber(this.number);
-
-  String toString() {
-    return ("$number $numberString");
-  }
-
-  static List<ExampleNumber> get list {
-    return (map.keys.map((num) {
-      return (ExampleNumber(num));
-    })).toList();
-  }
-}
-

@@ -6,17 +6,18 @@ import 'dart:async' show Future, StreamController;
 class JsonFilter {
 
 
-  /// Used the method to filter out unneeded city fields
-  /// from 9,6MB JSON file provided by Open Weather API
-  /// and create a slimmer cities_ru.json
 
+
+  // Used this method to filter out unneeded city fields
+  // from 9,6MB JSON file provided by Open Weather API
+  // and create a slimmer cities_ru.json
   Future<List<City>> _parseLargeJson( ) async {
     List<City> citiesInRussian = new List( );
 
     List data = json.decode(
         await rootBundle.loadString( 'assets/cities.json' ) );
 
-    /// manual deserialization is not recommended but it's quick
+    // manual deserialization is not recommended but it's quick
     data.forEach( ( v ) {
       if (v['id'] != null && v['langs'] != null) {
 
@@ -36,7 +37,7 @@ class JsonFilter {
   }
 }
 
-/// PODO for serialization
+// PODO for serialization
 class City{
   int id;
   String name;
