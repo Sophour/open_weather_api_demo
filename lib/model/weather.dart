@@ -2,12 +2,12 @@ class Weather{
 
   static const hPa_to_mmHg_factor = 0.750062; // гектопаскали в миллиметры ртутного столба
 
-  final  clouds;
+  final int clouds;
   final _pressure;
-  final humidity;
-  final temperature;
-  final  cityId;
-  int get pressure => _pressure != null? ( _pressure * hPa_to_mmHg_factor).round() : '' ;
+  final int humidity;
+  final double temperature;
+  final int cityId;
+  int get pressure => _pressure != null? ( _pressure * hPa_to_mmHg_factor).round() : 0 ;
 
   Weather( this.clouds, this._pressure, this.humidity, this.temperature,
       this.cityId);
@@ -18,17 +18,3 @@ class Weather{
   }
 
 }
-//
-//enum WeatherCondition {
-//  snow,
-//  sleet,
-//  hail,
-//  thunderstorm,
-//  heavyRain,
-//  lightRain,
-//  showers,
-//  heavyCloud,
-//  lightCloud,
-//  clear,
-//  unknown
-//}

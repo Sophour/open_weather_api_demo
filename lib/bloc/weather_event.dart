@@ -3,7 +3,7 @@ class WeatherEvent{
 }
 
 class FetchWeather extends WeatherEvent{
-  final String cityName;
+  final int cityId;
 
-  FetchWeather({@required this.cityName});
+  FetchWeather({@required this.cityId});
 }
