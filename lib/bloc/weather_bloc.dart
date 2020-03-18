@@ -17,12 +17,12 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
 
     if (event is FetchWeather) {
       yield WeatherLoading();
-      try {
-        final Weather weather = await _client.getCurrentWeather(event.cityId);
+//      try {
+        final Weather weather = await _client.getCurrentWeather(event.cityId, event.cityName);
         yield WeatherLoaded(weather: weather);
-      } catch (errMsg) {
-        yield WeatherError(errMsg.toString());
-      }
+//      } catch (errMsg) {
+//        yield WeatherError(errMsg.toString());
+//      }
     }
   }
 

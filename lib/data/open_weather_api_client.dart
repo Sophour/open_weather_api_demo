@@ -1,7 +1,3 @@
-
-import 'dart:io';
-
-import 'package:meta/meta.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -9,11 +5,12 @@ import 'package:weatherapidemo/model/weather.dart';
 
 class OpenWeatherApiClient{
 
+  //TODO hide key
   final _APIKEY = '9b794803e4f2e2eb52db008b599847b6';
   static const baseUrl = 'http://api.openweathermap.org/data/2.5/weather?';
 
 
-  Future<Weather> getCurrentWeather(int cityId) async{
+  Future<Weather> getCurrentWeather(int cityId, String cityName) async{
     //units=metric - Celsius
     var response = await http.get('${baseUrl}id=$cityId&APPID=$_APIKEY&units=metric');
 
@@ -26,14 +23,14 @@ class OpenWeatherApiClient{
         parsedJson['main']['pressure'],
         parsedJson['main']['humidity'],
         parsedJson['main']['temp'],
-        cityId );
+        cityName);
 
     if(currentWeather == null
         || currentWeather.temperature == null
         || currentWeather.clouds == null
         || currentWeather.humidity == null
         || currentWeather.pressure == null
-        || currentWeather.cityId == null)
+        || currentWeather.cityName == null)
       _handleBadWeatherMapping(currentWeather, response);
 
     return currentWeather;
