@@ -55,6 +55,35 @@ class WeatherConditionsDisplay extends StatelessWidget {
   }
 }
 
+/// Определяет внешний вид иконки облачности
+/// в завиимости от полученного с сервера значения
+class CloudinessDisplay extends StatelessWidget {
+
+  final int cloudinessInPercent;
+
+  const CloudinessDisplay({Key key, this.cloudinessInPercent}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return  Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        Text(WeatherIcons.mapCloudinessInPercentToText(cloudinessInPercent),
+          style: TextStyle(color: _weatherColorAccent),),
+        Padding(
+          padding: EdgeInsets.only(top: 10.0, bottom: 20.0),
+          child: Icon(
+            WeatherIcons.mapCloudinessInPercentToIcon(cloudinessInPercent),
+            color: Colors.white,
+            size: 70,
+
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class ValueTile extends StatelessWidget {
   final String label;
   final String value;
@@ -93,32 +122,5 @@ class ValueTile extends StatelessWidget {
   }
 }
 
-/// Определяет внешний вид иконки облачности
-/// в завиимости от полученного с сервера значения
-class CloudinessDisplay extends StatelessWidget {
 
-  final int cloudinessInPercent;
-
-  const CloudinessDisplay({Key key, this.cloudinessInPercent}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return  Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        Text(WeatherIcons.mapCloudinessInPercentToText(cloudinessInPercent),
-          style: TextStyle(color: _weatherColorAccent),),
-        Padding(
-          padding: EdgeInsets.only(top: 10.0, bottom: 20.0),
-          child: Icon(
-            WeatherIcons.mapCloudinessInPercentToIcon(cloudinessInPercent),
-            color: Colors.white,
-            size: 70,
-
-          ),
-        ),
-      ],
-    );
-  }
-}
 

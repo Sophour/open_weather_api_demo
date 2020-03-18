@@ -2,41 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:weatherapidemo/bloc/city_selection_bloc.dart';
 import 'package:searchable_dropdown/searchable_dropdown.dart';
+import 'package:weatherapidemo/bloc/weather_bloc.dart';
 import 'dart:collection';
-
 import 'package:weatherapidemo/data/cities_names_extractor.dart';
-import 'package:weatherapidemo/utils/weather_icon_mapper.dart';
 
-class SelectCityPage extends StatefulWidget {
-  final onCitySelected;
-
-  const SelectCityPage({Key key, this.onCitySelected}) : super(key: key);
+class CitySelectionWidget extends StatefulWidget {
 
   @override
-  _SelectCityPageState createState() => _SelectCityPageState(onCitySelected);
+  _CitySelectionWidgetState createState() => _CitySelectionWidgetState();
 }
 
-class _SelectCityPageState extends State<SelectCityPage> {
-  /// Mess
-  Function onCitySelectedAction;
-
-  void exec(Function onCitySelectedAction) {
-    onCitySelectedAction(_selectedCityId, _selectedCityName);
-  }
-
-  /// Mess end (no)
-
+class _CitySelectionWidgetState extends State<CitySelectionWidget> {
   int _selectedCityId;
   String _selectedCityName;
   List<DropdownMenuItem> items = new List();
   Map _allCities = new LinkedHashMap<String, int>();
 
-  _SelectCityPageState(this.onCitySelectedAction);
-
   @override
   void initState() {
     super.initState();
-    setCitiesDropdownListValues();
+    _setCitiesDropdownListValues();
   }
 
   @override
@@ -44,15 +29,17 @@ class _SelectCityPageState extends State<SelectCityPage> {
     return BlocBuilder<CitySelectionBloc, CitySelectionState>(
         builder: (context, state) {
       if (state is CitiesLoading) {
-        print('С О С Т О Я Н И Е: loading');
-        return Center(child: CircularProgressIndicator());
+        return Center(child:
+        Padding(
+          padding: EdgeInsets.only(top: 300),
+            child:CircularProgressIndicator()) );
       }
       if (state is EmptySelection) {
-        print('С О С Т О Я Н И Е: ready');
+        //TODO roll-in animation from the top
         return Center(
             child: Container(
           height: 350,
-          margin: EdgeInsets.only(left: 30.0, right: 30.0),
+          margin: EdgeInsets.only(left: 30.0, right: 30.0, top:200),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24.0),
             color: Colors.grey[50],
@@ -62,23 +49,7 @@ class _SelectCityPageState extends State<SelectCityPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             //crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              SizedBox(
-                width: 250,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Image.asset(
-                      'assets/images/logo.png',
-                      alignment: Alignment.center,
-                      height: 100,
-                    ),
-                    Text(
-                      'Open\nWeather\nAPI'.toUpperCase(),
-                      style: TextStyle(color: Colors.black, fontSize: 24),
-                    ),
-                  ],
-                ),
-              ),
+             _getLogoWidget(250),
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(36.0),
@@ -91,23 +62,7 @@ class _SelectCityPageState extends State<SelectCityPage> {
                 margin: EdgeInsets.all(10.0),
 
                 //padding: EdgeInsets.only(bottom:10.0),
-                child: SearchableDropdown.single(
-                  displayClearIcon: false,
-//                  iconEnabledColor: Colors.black54,
-                  //underline: '', // leads to a bug, but if uncommented spoils the appearance
-                  isExpanded: true,
-                  items: items,
-                  value: _selectedCityId,
-                  hint: Text(
-                    "Выберите город",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.black54, fontSize: 18),
-                  ),
-                  onChanged: (key) {
-                    _selectedCityName = key;
-                    _selectedCityId = _allCities[key];
-                  },
-                ),
+                child: _getCitiesDropdownWidget(),
               ),
               RaisedButton(
                 child: Container(
@@ -131,117 +86,44 @@ class _SelectCityPageState extends State<SelectCityPage> {
                   if (_selectedCityId != null) {
                     BlocProvider.of<CitySelectionBloc>(context).add(
                         CitySelectedEvent(_selectedCityId, _selectedCityName));
-                    exec(onCitySelectedAction);
+                    //exec(onCitySelectedAction);
+                    BlocProvider.of<WeatherBloc>(context).add(FetchWeatherEvent(
+                        cityName: _selectedCityName, cityId: _selectedCityId));
                   }
                 },
               ),
             ],
           )),
         ));
-//            Container(
-//            padding: EdgeInsets.all(16.0),
-//            child: Column(
-//
-//              crossAxisAlignment: CrossAxisAlignment.start,
-//              children: <Widget>[
-//                SearchableDropdown.single(
-//                  items: items,
-//                  value: _selectedCityId,
-//                  hint: "Выберите город",
-//                  searchHint: "Выберите город",
-//                  onChanged: (key) {
-//                    _selectedCityName = key;
-//                    _selectedCityId = _allCities[key];
-//                  },
-//                  isExpanded: true,
-//                ),
-//
-//                RaisedButton(
-//                  child: Text('Запросить погоду'),
-//                  onPressed: (){
-//                    if(_selectedCityId != null) {
-//                      BlocProvider.of<CitySelectionBloc>( context )
-//                          .add( CitySelectedEvent( _selectedCityId, _selectedCityName ) );
-//                      exec( onCitySelectedAction );
-//                    }
-//                  },
-//                ),
-//              ],
-//            ),
-//          );
       }
       if (state is CitySelected) {
-        print('С О С Т О Я Н И Е: selected');
 
-        return Container(
-          height: 30,
-          margin: EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            color: Colors.white70,
-            borderRadius: BorderRadius.circular(30.0),
-          ),
-          child: Row(
-            children: <Widget>[
-              Padding(
-                  padding: EdgeInsets.only(left: 15.0),
-                  child: Center(
-                    child: Icon(Icons.search, color: Colors.black54),
-                  )),
-              Padding(
-                padding: const EdgeInsets.only(left: 10, right: 10),
-                child: Center(
-                    child: Container(
-                  width: 1,
-                  height: 20,
-                  color: Colors.black54,
-                )),
-              ),
-              Text(
-                'Другой город',
-                style: TextStyle(color: Colors.black54),
-              )
-            ],
-          ),
-//            child: Column(
-//              crossAxisAlignment: CrossAxisAlignment.start,
-//              children: <Widget>[
-//                SearchableDropdown.single(
-//                  items: items,
-//                  value: _selectedCityId,
-//                  hint: "Выберите город",
-//                  searchHint: "Выберите город",
-//                  onChanged: (key) {
-//                    _selectedCityName = key;
-//                    _selectedCityId = _allCities[key];
-//                  },
-//                  isExpanded: true,
-//                ),
-//                RaisedButton(
-//                  child: Text('Обновить данные'),
-//                  onPressed: (){
-//                    if(_selectedCityId != null) {
-//                      BlocProvider.of<CitySelectionBloc>( context )
-//                          .add( CitySelectedEvent( _selectedCityId, _selectedCityName ) );
-//                      exec( onCitySelectedAction );
-//                    }
-//                  },
-//                ),
-//              ],
-//            ),
-        );
+        return Padding(
+          padding: EdgeInsets.only(top:60),
+            child: GestureDetector(
+                child: _getLittleSearchBar(),
+                onTap: (){
+                  BlocProvider.of<CitySelectionBloc>(context).add(
+                      CitiesListReadyEvent());
+                  BlocProvider.of<WeatherBloc>(context).add(ClearWeatherEvent());
+                },
+                ));
       }
       if (state is CityError) {
-        print('С О С Т О Я Н И Е: err');
-        return Text(
-          'Где-то проёбка с городом!',
-          style: TextStyle(color: Colors.red),
-        );
+        //TODO fix too
+        Scaffold.of( context ).showSnackBar(
+            SnackBar(
+              duration: Duration( seconds: 8 ),
+              content: Text(
+                  'Ошибка возникла при выборе города.',
+                style: TextStyle( color: Colors.pink[200] ),
+              ), ) );
       }
       return null;
     });
   }
 
-  setCitiesDropdownListValues() async {
+  _setCitiesDropdownListValues() async {
     CitiesNamesExtractor extractor = new CitiesNamesExtractor();
     _allCities = await extractor.getCitiesNamesMap();
 
@@ -252,6 +134,78 @@ class _SelectCityPageState extends State<SelectCityPage> {
       ));
     });
 
-    BlocProvider.of<CitySelectionBloc>(context).add(CitiesListLoadedEvent());
+    BlocProvider.of<CitySelectionBloc>(context).add(CitiesListReadyEvent());
+  }
+
+  Widget _getLittleSearchBar(){
+    return Container(
+      height: 30,
+      margin: EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Colors.white70,
+        borderRadius: BorderRadius.circular(30.0),
+      ),
+      child: Row(
+        children: <Widget>[
+          Padding(
+              padding: EdgeInsets.only(left: 15.0),
+              child: Center(
+                child: Icon(Icons.search, color: Colors.black54),
+              )),
+          Padding(
+            padding: const EdgeInsets.only(left: 10, right: 10),
+            child: Center(
+                child: Container(
+                  width: 1,
+                  height: 20,
+                  color: Colors.black54,
+                )),
+          ),
+          Text(
+            'Другой город',
+            style: TextStyle(color: Colors.black54),
+          )
+        ],
+      ),);
+  }
+
+  Widget _getLogoWidget(double width) {
+    return  SizedBox(
+      width: width,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          Image.asset(
+            'assets/images/logo.png',
+            alignment: Alignment.center,
+            height: 100,
+          ),
+          Text(
+            'Open\nWeather\nAPI'.toUpperCase(),
+            style: TextStyle(color: Colors.black, fontSize: 24),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _getCitiesDropdownWidget(){
+    return SearchableDropdown.single(
+      displayClearIcon: false,
+//                  iconEnabledColor: Colors.black54,
+      //underline: '', // leads to a bug, but if uncommented spoils the appearance
+      isExpanded: true,
+      items: items,
+      value: _selectedCityId,
+      hint: Text(
+        "Выберите город",
+        textAlign: TextAlign.center,
+        style: TextStyle(color: Colors.black54, fontSize: 18),
+      ),
+      onChanged: (key) {
+        _selectedCityName = key;
+        _selectedCityId = _allCities[key];
+      },
+    );
   }
 }

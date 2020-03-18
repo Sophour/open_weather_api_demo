@@ -8,7 +8,10 @@ import 'package:weatherapidemo/bloc/weather_bloc.dart';
 
 main() {
   BlocSupervisor.delegate = SimpleBlocDelegate();
-  runApp(BlocProvider<CitySelectionBloc>(
+  runApp(
+
+    //TODO experiment with multiple bloc builder
+      BlocProvider<CitySelectionBloc>(
       create: (context) => CitySelectionBloc(),
       child: OpenWeatherApiDemoApp()));
 }
@@ -20,14 +23,7 @@ class OpenWeatherApiDemoApp extends StatelessWidget {
       builder: (context, citySelectionState){
         return MaterialApp(
           title: 'Open Weather Api Demo',
-          theme: ThemeData(
-            primarySwatch: Colors.grey,
-            accentColor: Colors.white,
-            highlightColor: Colors.white,
-            brightness: Brightness.light,
-            backgroundColor: Colors.black38,
-            cursorColor: Colors.black38
-          ),
+          theme: _themeData(),
           home: BlocProvider(
             create: (context) => WeatherBloc(OpenWeatherApiClient()),
             child: OpenDemoApiPage(),
@@ -35,7 +31,17 @@ class OpenWeatherApiDemoApp extends StatelessWidget {
         );
       },
 
-    )
-;
+    );
+  }
+
+  ThemeData _themeData(){
+    return ThemeData(
+        primarySwatch: Colors.grey,
+        accentColor: Colors.white,
+        highlightColor: Colors.white,
+        brightness: Brightness.light,
+        backgroundColor: Colors.black38,
+        cursorColor: Colors.black38
+    );
   }
 }

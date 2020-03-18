@@ -8,7 +8,7 @@ class CitySelectionBloc extends Bloc<CitySelectionEvent, CitySelectionState>{
   @override
   Stream<CitySelectionState> mapEventToState(event) async* {
     try {
-      if (event is CitiesListLoadedEvent) {
+      if (event is CitiesListReadyEvent) {
         yield EmptySelection();
       }
       else if(event is CitySelectedEvent){
@@ -30,7 +30,7 @@ class CitySelectedEvent extends CitySelectionEvent{
   CitySelectedEvent(this.cityId, this.cityName);
 }
 
-class CitiesListLoadedEvent extends CitySelectionEvent{}
+class CitiesListReadyEvent extends CitySelectionEvent{}
 
 /// States
 class CitySelectionState{}

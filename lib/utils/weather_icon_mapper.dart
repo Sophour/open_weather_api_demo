@@ -19,7 +19,6 @@ class WeatherIcons {
   static const IconData heavy_clouds = const _IconData(0xf013);
   static const IconData humidity = const _IconData(0xf07a);
   static const IconData barometer = const _IconData(0xf079);
-  static const IconData app_icon = const _IconData(0xf003);
 
 
    static IconData mapCloudinessInPercentToIcon(int cloudiness){
