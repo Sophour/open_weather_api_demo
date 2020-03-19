@@ -5,6 +5,7 @@ import 'package:searchable_dropdown/searchable_dropdown.dart';
 import 'package:weatherapidemo/bloc/weather_bloc.dart';
 import 'dart:collection';
 import 'package:weatherapidemo/data/cities_names_extractor.dart';
+import 'package:weatherapidemo/widgets/error_widget.dart';
 
 class CitySelectionWidget extends StatefulWidget {
 
@@ -86,7 +87,6 @@ class _CitySelectionWidgetState extends State<CitySelectionWidget> {
                   if (_selectedCityId != null) {
                     BlocProvider.of<CitySelectionBloc>(context).add(
                         CitySelectedEvent(_selectedCityId, _selectedCityName));
-                    //exec(onCitySelectedAction);
                     BlocProvider.of<WeatherBloc>(context).add(FetchWeatherEvent(
                         cityName: _selectedCityName, cityId: _selectedCityId));
                   }
@@ -99,27 +99,16 @@ class _CitySelectionWidgetState extends State<CitySelectionWidget> {
       if (state is CitySelected) {
 
         return Padding(
-          padding: EdgeInsets.only(top:60),
-            child: GestureDetector(
-                child: _getLittleSearchBar(),
-                onTap: (){
-                  BlocProvider.of<CitySelectionBloc>(context).add(
-                      CitiesListReadyEvent());
-                  BlocProvider.of<WeatherBloc>(context).add(ClearWeatherEvent());
-                },
-                ));
+          padding: EdgeInsets.only(top:30),
+            child: _getLittleSearchBar(),);
       }
       if (state is CityError) {
-        //TODO fix too
-        Scaffold.of( context ).showSnackBar(
-            SnackBar(
-              duration: Duration( seconds: 8 ),
-              content: Text(
-                  'Ошибка возникла при выборе города.',
-                style: TextStyle( color: Colors.pink[200] ),
-              ), ) );
+        Future.microtask(()=>
+            ErrorSnackBar('Ошибка возникла при выборе города.\n ${state.errorMessage}',
+                context).show());
+      return _getLittleSearchBar();
       }
-      return null;
+      return Container();
     });
   }
 
@@ -138,7 +127,13 @@ class _CitySelectionWidgetState extends State<CitySelectionWidget> {
   }
 
   Widget _getLittleSearchBar(){
-    return Container(
+       return GestureDetector(
+    onTap: (){
+    BlocProvider.of<CitySelectionBloc>(context).add(
+    CitiesListReadyEvent());
+    BlocProvider.of<WeatherBloc>(context).add(ClearWeatherEvent());
+    },
+    child: Container(
       height: 30,
       margin: EdgeInsets.all(16.0),
       decoration: BoxDecoration(
@@ -166,7 +161,7 @@ class _CitySelectionWidgetState extends State<CitySelectionWidget> {
             style: TextStyle(color: Colors.black54),
           )
         ],
-      ),);
+      ),));
   }
 
   Widget _getLogoWidget(double width) {

@@ -11,14 +11,19 @@ class CitiesNamesExtractor{
 
     Map allCities = new LinkedHashMap<String, int>();
 
-    List citiesInRussian = await _extractCitiesFromJson();
+    try {
+      List citiesInRussian = await _extractCitiesFromJson( );
 
-    citiesInRussian.forEach((city){
-      if(city['id'] != null && city['name'] != null)
-        allCities[city['name']] = city['id'];
-    });
+      citiesInRussian.forEach( ( city ) {
+        if (city['id'] != null && city['name'] != null)
+          allCities[city['name']] = city['id'];
+      } );
 
-    return allCities;
+      return allCities;
+    }catch(err)
+    {
+      throw(err.toString());
+    }
   }
 
   Future<List> _extractCitiesFromJson( ) async {

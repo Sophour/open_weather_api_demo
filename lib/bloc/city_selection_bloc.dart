@@ -14,8 +14,8 @@ class CitySelectionBloc extends Bloc<CitySelectionEvent, CitySelectionState>{
       else if(event is CitySelectedEvent){
         yield CitySelected(event.cityId, event.cityName);
       }
-    }catch(_){
-      yield CityError();
+    }catch(error){
+      yield CityError(error.toString());
     }
   }
 }
@@ -43,4 +43,8 @@ class CitySelected extends CitySelectionState{
 
   CitySelected(this.cityId, this.cityName);
 }
-class CityError extends CitySelectionState{}
+class CityError extends CitySelectionState{
+  final String errorMessage;
+
+  CityError(this.errorMessage);
+}

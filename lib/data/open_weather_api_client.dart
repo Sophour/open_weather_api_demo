@@ -23,7 +23,7 @@ class OpenWeatherApiClient{
         parsedJson['main']['pressure'],
         parsedJson['main']['humidity'],
         parsedJson['main']['temp'],
-        cityName);
+        cityName, cityId);
 
     if(currentWeather == null
         || currentWeather.temperature == null
@@ -40,6 +40,8 @@ class OpenWeatherApiClient{
   }
 
   }
+
+//TODO handle exception when wifi is turned off
 
   _handleBadStatusCode(http.Response response){
     String reason;

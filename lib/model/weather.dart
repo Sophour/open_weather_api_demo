@@ -7,9 +7,10 @@ class Weather{
   final int humidity;
   final temperature;
   final String cityName;
+  final int cityId;
   int get pressure => _pressure != null? ( _pressure * hPa_to_mmHg_factor).round() : 0 ;
 
   Weather( this.clouds, this._pressure, this.humidity, this.temperature,
-      this.cityName);
+      this.cityName, this.cityId);
 
 }

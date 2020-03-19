@@ -19,7 +19,7 @@ class WeatherConditionsDisplay extends StatelessWidget {
           softWrap: false,
           overflow: TextOverflow.fade,
           style: TextStyle(
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w300,
           fontSize: 34.0,
           letterSpacing: 5.0,
           color: Colors.white,
@@ -30,7 +30,7 @@ class WeatherConditionsDisplay extends StatelessWidget {
           style: TextStyle(
               fontSize: 100,
               fontWeight: FontWeight.w100,
-              color: _weatherColorAccent),
+              color: Colors.white),
         ),
         Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
           ValueTile("мм рт.ст",
@@ -69,7 +69,7 @@ class CloudinessDisplay extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Text(WeatherIcons.mapCloudinessInPercentToText(cloudinessInPercent),
-          style: TextStyle(color: _weatherColorAccent),),
+          style: TextStyle(color: _weatherColorAccent, fontWeight: FontWeight.w100, fontSize: 18),),
         Padding(
           padding: EdgeInsets.only(top: 10.0, bottom: 20.0),
           child: Icon(

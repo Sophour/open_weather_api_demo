@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:weatherapidemo/bloc/weather_bloc.dart';
+import 'package:weatherapidemo/widgets/error_widget.dart';
 import 'package:weatherapidemo/widgets/weather_conditions_display.dart';
 
 
@@ -10,7 +11,6 @@ class WeatherDisplayWidget extends StatefulWidget {
 }
 
 class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget> {
-  //TODO lastCityId and Name vars
 
   @override
   Widget build(BuildContext context) {
@@ -24,43 +24,69 @@ class _WeatherDisplayWidgetState extends State<WeatherDisplayWidget> {
             child: CircularProgressIndicator());
       }
       if (state is WeatherLoaded) {
-        return Container(
 
-            padding: EdgeInsets.all(16.0),
+        return Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                SizedBox(
-                  height: 100.0,
+                Container(
+                  margin: EdgeInsets.only(top:160.0),
+                  child: WeatherConditionsDisplay(weather: state.weather),
                 ),
 
-                WeatherConditionsDisplay(weather: state.weather),
-
-                //TODO make a decent refresh button
-//             FloatingActionButton(
-//                    backgroundColor: Colors.white,
-//                    child: Icon(Icons.refresh, size: 30,),
-//                    onPressed: (){
-//                      BlocProvider.of<WeatherBloc>(context).add(
-//                          FetchWeatherEvent(cityId: 565764,cityName:state.weather.cityName ));
-//                    },
-//                  ),
-
+                _refreshButton(state.weather.cityId, state.weather.cityName ),
 
               ],
             ));
       }
       if (state is WeatherError) {
-        //TODO fix setState exception
-          Scaffold.of( context ).showSnackBar(
-              SnackBar(
-                duration: Duration( seconds: 8 ),
-                content: Text(
-                  'Ошибка при отображении погоды.\n${state.errorMsg}',
-                  style: TextStyle( color: Colors.pink[200] ),
-                ), ) );
+
+        Future.microtask(()=>
+          ErrorSnackBar('Ошибка при отображении погоды.\n ${state.errorMsg}',
+          context).show());
+
+        return Expanded(
+            child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(bottom: 0.0),
+              child: Image.asset(
+                'assets/images/error_icon.png',
+                alignment: Alignment.center,
+                height: 300,
+              ),
+            ),
+            Text('Что-то пошло\nне так! ;(',
+            style: TextStyle(color: Colors.white70,
+                fontSize: 36,
+            fontWeight: FontWeight.w300),
+            textAlign: TextAlign.center,),
+          ],
+        ));
             }
       return Container();
     });
   }
+
+  Widget _refreshButton(int cityId, String cityName) {
+    return Container(
+      alignment: Alignment.bottomRight,
+      margin: EdgeInsets.only(top:30, right: 30.0, bottom: 30.0),
+      child: FloatingActionButton(
+        backgroundColor: Colors.white,
+        child: Icon(Icons.refresh, size: 30,),
+        onPressed: (){
+          BlocProvider.of<WeatherBloc>(context).add(
+              FetchWeatherEvent(
+                  cityId: cityId,
+                  cityName:cityName ));
+        },
+      ),
+    );
+  }
+
+
+
 }

@@ -19,7 +19,7 @@ class _OpenDemoApiPageState extends State<OpenDemoApiPage> {
         Column(
         children: <Widget>[
         CitySelectionWidget(),
-        WeatherDisplayWidget(),
+ WeatherDisplayWidget(),
       ],
     ),
 
